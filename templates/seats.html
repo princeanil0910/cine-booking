@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Select Seats — {{ movie.title }}{% endblock %}
+{% block content %}
+<section class="section booking-layout">
+  <div>
+    <p class="eyebrow">{{ movie.title }} • {{ show.time }}</p>
+    <h1>Select your seats</h1>
+    <p class="muted">{{ show.date }} · {{ show.screen }} · {{ show.format }}</p>
+
+    <div class="seat-legend">
+      <span><i class="available"></i> Available</span>
+      <span><i class="selected"></i> Selected</span>
+      <span><i class="taken"></i> Booked</span>
+    </div>
+
+    <div class="screen">SCREEN</div>
+    <div class="seat-map" data-showtime="{{ show.id }}">
+      {% for row in seat_rows %}
+      <div class="seat-row">
+        <b>{{ row }}</b>
+        {% for num in range(1, seats_per_row + 1) %}
+          {% set seat = row ~ num %}
+          <button type="button"
+            class="seat {% if seat in booked %}taken{% endif %}"
+            data-seat="{{ seat }}"
+            {% if seat in booked %}disabled{% endif %}>{{ num }}</button>
+        {% endfor %}
+        <b>{{ row }}</b>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside class="booking-card" data-ticket-price="{{ show.price }}"><span class="seat-price" data-price="{{ show.price }}" data-ticket-price="{{ show.price }}"></span>
+    <p class="eyebrow">Your booking</p>
+    <h2>Confirm seats</h2>
+    <div class="summary-row"><span>Movie</span><strong>{{ movie.title }}</strong></div>
+    <div class="summary-row"><span>Show</span><strong>{{ show.time }}</strong></div>
+    <div class="summary-row"><span>Seats</span><strong id="seatSummary">None</strong></div>
+    <div class="summary-row total"><span>Total</span><strong id="total">₹0</strong></div>
+
+    <form id="bookingForm">
+      <input type="hidden" name="showtime_id" value="{{ show.id }}">
+      <input type="hidden" name="seats" id="seatsInput">
+      <label>Full name<input name="name" required placeholder="Your name"></label>
+      <label>Phone<input name="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number"></label>
+      <label>Email <span class="optional">(optional)</span><input name="email" type="email" placeholder="you@example.com"></label>
+      <button class="btn primary wide" type="submit">Pay ₹<span id="payAmount">0</span> & Confirm</button>
+      <p id="formMsg" class="form-msg"></p>
+    </form>
+  </aside>
+</section>
+{% endblock %}

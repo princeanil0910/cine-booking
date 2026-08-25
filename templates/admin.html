@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — Cine Booking{% endblock %}
+{% block content %}
+<section class="section admin-shell">
+  <div class="admin-head"><div><p class="eyebrow">Control center</p><h1>Booking dashboard</h1></div><a class="btn dark" href="{{ url_for('admin_logout') }}">Log out</a></div>
+
+  <div class="stats">
+    <div><span>Total bookings</span><strong>{{ stats.bookings }}</strong></div>
+    <div><span>Tickets sold</span><strong>{{ stats.tickets }}</strong></div>
+    <div><span>Paid revenue</span><strong>₹{{ "%.0f"|format(stats.revenue) }}</strong></div>
+    <div><span>Cancelled</span><strong>{{ stats.cancelled }}</strong></div>
+  </div>
+
+  <div class="admin-list">
+  {% for b in bookings %}
+    <article class="admin-booking" id="booking-{{ b.id }}">
+      <div class="admin-booking-top">
+        <div><span class="eyebrow">{{ b.booking_code }}</span><h2>{{ b.movie.title }}</h2><p>{{ b.name }} · {{ b.phone }}</p></div>
+        <span class="status-badge {{ 'cancelled' if b.booking_status == 'Cancelled' else 'confirmed' }}">{{ b.booking_status }}</span>
+      </div>
+      <div class="admin-details">
+        <span><b>Show</b>{{ b.showtime_id }}</span>
+        <span><b>Seats</b>{{ b.seats }}</span>
+        <span><b>Amount</b>₹{{ "%.0f"|format(b.amount) }}</span>
+        <span><b>Created</b>{{ b.created_at }}</span>
+      </div>
+      <form class="admin-form" method="post" action="{{ url_for('admin_update', booking_id=b.id) }}">
+        <label>Status<select name="booking_status"><option {{ 'selected' if b.booking_status == 'Confirmed' }}>Confirmed</option><option {{ 'selected' if b.booking_status == 'Cancelled' }}>Cancelled</option></select></label>
+        <label>Payment<select name="payment_status"><option {{ 'selected' if b.payment_status == 'Paid' }}>Paid</option><option {{ 'selected' if b.payment_status == 'Pending' }}>Pending</option><option {{ 'selected' if b.payment_status == 'Refund pending' }}>Refund pending</option><option {{ 'selected' if b.payment_status == 'Refunded' }}>Refunded</option></select></label>
+        <button class="btn primary small">Save</button>
+      </form>
+    </article>
+  {% else %}
+    <div class="empty"><h2>No bookings yet</h2><p>New cinema bookings will appear here.</p></div>
+  {% endfor %}
+  </div>
+</section>
+{% endblock %}

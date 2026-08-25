@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Booking {{ booking.booking_code if booking else "Not found" }}{% endblock %}
+{% block content %}
+<section class="status-shell">
+{% if booking %}
+  <p class="eyebrow">Booking confirmed</p>
+  <h1>{{ booking.booking_code }}</h1>
+  <div class="status-card" data-booking-code="{{ booking.booking_code }}" data-updated-at="{{ booking.updated_at or booking.created_at }}">
+    <div class="status-top"><div><span class="muted">Status</span><strong>{{ booking.booking_status }}</strong></div><div class="status-check">✓</div></div>
+    <h2>{{ booking.movie.title }}</h2>
+    <p>{{ booking.show.date }} · {{ booking.show.time }} · {{ booking.show.screen }} · {{ booking.show.format }}</p>
+    <div class="status-grid">
+      <div><span>Customer</span><strong>{{ booking.name }}</strong></div>
+      <div><span>Seats</span><strong>{{ booking.seats }}</strong></div>
+      <div><span>Tickets</span><strong>{{ booking.seat_count }}</strong></div>
+      <div><span>Payment</span><strong>{{ booking.payment_status }}</strong></div>
+      <div><span>Total</span><strong>₹{{ "%.0f"|format(booking.amount) }}</strong></div>
+    </div>
+    <div class="status-actions">
+      <a class="btn dark" href="{{ url_for('booking_receipt', booking_code=booking.booking_code) }}">Download receipt</a>
+      {% if booking.booking_status != "Cancelled" %}
+      <button class="btn danger" data-cancel="{{ booking.booking_code }}">Cancel booking</button>
+      {% endif %}
+    </div>
+    <p class="booking-update" id="bookingUpdate">Last updated {{ booking.updated_at or booking.created_at }}</p>
+    <p id="cancelMsg" class="form-msg"></p>
+  </div>
+{% else %}
+  <div class="empty"><h2>Booking not found</h2><p>Check the booking code and try again.</p></div>
+{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ movie.title }} — Cine Booking{% endblock %}
+{% block content %}
+<section class="movie-hero">
+  <img src="{{ movie.poster }}" alt="{{ movie.title }}">
+  <div>
+    <p class="eyebrow">{{ movie.genre }}</p>
+    <h1>{{ movie.title }}</h1>
+    <div class="chips"><span>{{ movie.rating }}</span><span>{{ movie.language }}</span><span>{{ movie.duration }}</span></div>
+    <div class="rating-line"><strong>★ {{ "%.1f"|format(average_rating) if average_rating else "New" }}</strong><span>{{ reviews|length }} audience review{{ '' if reviews|length == 1 else 's' }}</span></div>
+    <div class="movie-facts"><span><b>Cast</b>{{ movie.cast }}</span><span><b>Director</b>{{ movie.director }}</span></div>
+    <p>{{ movie.description }}</p>
+    <div class="movie-update"><strong>Latest update</strong><span>{{ movie.update }}</span></div>
+    {% if movie.release_date %}<div class="release-banner">Releasing on {{ movie.release_date }}</div>{% endif %}
+    {% if movie.id == 103 %}<a class="btn primary toxic-action" href="#offers">I'm interested</a>{% endif %}
+  </div>
+</section>
+
+{% if movie.id == 103 %}
+<section class="section offers-section" id="offers"><div class="section-head"><div><p class="eyebrow">Save more on your tickets</p><h2>Top offers for you</h2></div></div><div class="offers-row"><article><strong>◉</strong><div><b>Enjoy B1G1 Ticket Free! with Bandhan Bank...</b><span>Tap to view details</span></div></article><article><strong>✓</strong><div><b>Buy 1 get 1 movie ticket free + 50% off</b><span>Tap to view details</span></div></article><button class="shelf-arrow" type="button" aria-label="See more offers">›</button></div></section>
+{% endif %}
+
+<section class="section cast-section"><div class="section-head"><div><p class="eyebrow">Meet the characters</p><h2>Cast</h2></div></div><div class="cast-shelf">{% for person in movie.cast_members %}<article><a href="{{ url_for('actor_detail', actor_name=person.name) }}"><img src="{{ person.image }}" alt="{{ person.name }}"><h3>{{ person.name }}</h3><p>{{ person.role }}</p></a></article>{% endfor %}<button class="shelf-arrow" type="button" aria-label="See more cast" data-cast-next>›</button></div></section>
+
+<section class="section about-movie">
+  <p class="eyebrow">The story</p>
+  <h2>About the movie</h2>
+  <p>{{ movie.description }}</p>
+  <div class="about-facts"><span><b>Language</b>{{ movie.language }}</span><span><b>Runtime</b>{{ movie.duration }}</span><span><b>Certificate</b>{{ movie.rating }}</span></div>
+</section>
+
+<section class="section">
+  <p class="eyebrow">Choose a show</p>
+  <h2>Today's showtimes</h2>
+  <div class="show-grid">
+    {% for show in shows %}
+    <article class="show-card">
+      <div><strong>{{ movie.title }}</strong><span>{{ show.theatre.name }}</span></div>
+      <div><strong>{{ show.date }}</strong><span>{{ show.time }} • {{ show.format }}</span></div>
+      <div><span>{{ show.theatre.area }}, Bengaluru</span><strong>₹{{ show.price }}/seat</strong></div>
+      <a class="btn primary small" href="{{ url_for('seat_selection', showtime_id=show.id) }}">Select seats</a>
+    </article>
+    {% endfor %}
+    {% if not shows %}<div class="empty"><h3>Bookings open soon</h3><p>{{ movie.title }} releases on {{ movie.release_date }}. Check back tomorrow for Bengaluru showtimes.</p></div>{% endif %}
+  </div>
+</section>
+
+<section class="section" id="reviews">
+  <div class="section-head"><div><p class="eyebrow">Audience voices</p><h2>Ratings & reviews</h2></div><span class="rating-large">★ {{ "%.1f"|format(average_rating) if average_rating else "New" }}</span></div>
+  <div class="review-layout">
+    <div class="review-list">
+      {% for review in reviews %}
+      <article class="review-card"><div class="review-top"><strong>{{ review.name }}</strong><span>★ {{ review.rating }}/5</span></div><p>{{ review.comment }}</p></article>
+      {% else %}<div class="empty"><h3>No reviews yet</h3><p>Be the first to share your experience.</p></div>{% endfor %}
+    </div>
+    <form class="feedback-card" method="post" action="{{ url_for('add_review', movie_id=movie.id) }}"><p class="eyebrow">Share your take</p><h3>How was the movie?</h3><label>Your name<input name="name" required maxlength="60" placeholder="Name"></label><label>Rating<select name="rating" required><option value="">Choose a rating</option><option value="5">★★★★★ Excellent</option><option value="4">★★★★☆ Great</option><option value="3">★★★☆☆ Good</option><option value="2">★★☆☆☆ Fair</option><option value="1">★☆☆☆☆ Poor</option></select></label><label>Your review<textarea name="comment" required maxlength="500" rows="4" placeholder="Tell other moviegoers what you thought"></textarea></label><button class="btn primary wide">Post review</button></form>
+  </div>
+</section>
+
+<section class="section tinted"><div class="section-head"><div><p class="eyebrow">Find your screen</p><h2>Shows near Bengaluru</h2></div></div><div class="theatre-grid">{% for theatre in theatres[:3] %}<article class="theatre-card"><div class="theatre-icon">▣</div><div><h3>{{ theatre.name }}</h3><p>{{ theatre.area }} · {{ theatre.distance }}</p><span>{{ theatre.features }}</span></div></article>{% endfor %}</div></section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Admin Login — Cine Booking{% endblock %}
+{% block content %}
+<section class="login-shell">
+  <form class="login-card" method="post">
+    <p class="eyebrow">Cine Booking</p><h1>Admin login</h1>
+    {% if error %}<p class="form-msg err">{{ error }}</p>{% endif %}
+    <label>Username<input name="username" required></label>
+    <label>Password<input name="password" type="password" required></label>
+    <button class="btn primary wide">Sign in</button>
+    <small>Demo: admin / admin123</small>
+  </form>
+</section>
+{% endblock %}

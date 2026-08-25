@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Cine Booking — Movies{% endblock %}
+{% block content %}
+<section class="promo-shell" aria-label="Featured promotions">
+  <div class="promo-track" id="promoTrack">
+    <article class="promo-slide active"><img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1800&q=85" alt="Cinema screen with red seats"><div class="promo-copy"><span>Now showing in Bengaluru</span><h1>Make your<br>movie plans.</h1><a class="btn primary" href="#movies">Explore movies</a></div></article>
+    <article class="promo-slide"><img src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1800&q=85" alt="Movie theatre seats"><div class="promo-copy"><span>Big stories. Bigger screens.</span><h1>Find your<br>next favourite.</h1><a class="btn primary" href="#upcoming">See upcoming</a></div></article>
+    <button class="promo-arrow previous" type="button" data-promo-direction="-1" aria-label="Previous promotion">‹</button><button class="promo-arrow next" type="button" data-promo-direction="1" aria-label="Next promotion">›</button><div class="promo-dots"><button class="active" type="button" data-promo-dot="0" aria-label="Promotion 1"></button><button type="button" data-promo-dot="1" aria-label="Promotion 2"></button></div>
+  </div>
+</section>
+
+<section class="section" id="movies">
+  <div class="section-head">
+    <div><p class="eyebrow">Now showing</p><h2>Pick your movie</h2></div>
+    <form class="search" method="get" role="search">
+      <input id="movieSearch" name="q" value="{{ q }}" placeholder="Search movies, genre, language..." autocomplete="off" aria-label="Search movies">
+      <button class="btn dark">Search</button>
+      <button class="clear-search" type="button" id="clearSearch" aria-label="Clear search" hidden>×</button>
+    </form>
+  </div>
+  <p class="search-result" id="searchResult" aria-live="polite"></p>
+
+  <div class="shelf-heading"><h2>Recommended Movies</h2><a href="#movies">See all ›</a></div>
+  <div class="recommended-shelf">
+  {% for movie in recommended %}
+    <article class="recommend-card"><a href="{% if movie.id < 100 or movie.id == 103 %}{{ url_for('movie_detail', movie_id=movie.id) }}{% else %}#upcoming{% endif %}"><div class="poster-wrap"><img src="{{ movie.poster }}" alt="{{ movie.title }}"><span class="promoted">{% if loop.index < 3 %}PROMOTED{% else %}TRENDING{% endif %}</span><div class="poster-rating"><strong>{% if loop.index == 1 %}★ 1.4M+ Likes{% elif loop.index == 2 %}★ 8.6/10 &nbsp; 70.7K+ Votes{% else %}♥ {{ 120 + loop.index * 11 }}K+ Likes{% endif %}</strong></div></div><h3>{{ movie.title }}</h3><p>{{ movie.genre|replace(' • ', '/') }}</p></a></article>
+  {% endfor %}
+  <button class="shelf-arrow" type="button" aria-label="See more recommended movies" data-shelf-next>›</button>
+  </div>
+
+  <div class="catalogue-heading"><p class="eyebrow">Now showing</p><h2>Pick your movie</h2></div>
+  <div class="movie-grid">
+  {% for movie in movies %}
+    <article class="movie-card" data-movie-card data-search-text="{{ movie.title }} {{ movie.genre }} {{ movie.language }}"><img src="{{ movie.poster }}" alt="{{ movie.title }}"><div class="movie-body"><div class="chips"><span>{{ movie.rating }}</span><span>{{ movie.language }}</span><span>{{ movie.duration }}</span></div><h3>{{ movie.title }}</h3><p>{{ movie.genre }}</p><div class="card-bottom"><strong>From ₹{{ movie.price }}</strong><a class="btn primary small" href="{{ url_for('movie_detail', movie_id=movie.id) }}">Book tickets</a></div></div></article>
+  {% else %}<div class="empty" id="noMovies"><h3>No movies found</h3><p>Try another title, genre or language.</p></div>{% endfor %}
+  </div>
+</section>
+
+<section class="section language-band" id="languages"><div class="section-head"><div><p class="eyebrow">Watch in your language</p><h2>Explore by language</h2></div></div><div class="language-list"><a href="?q=Kannada#movies">Kannada <span>4 films</span></a><a href="?q=Hindi#movies">Hindi <span>1 film</span></a><a href="?q=Tamil#movies">Tamil <span>1 film</span></a><a href="?q=Telugu#movies">Telugu <span>1 film</span></a><a href="?q=Malayalam#movies">Malayalam <span>1 film</span></a><a href="?q=English#movies">English <span>2 films</span></a></div></section>
+
+<section class="section tinted" id="upcoming">
+  <div class="section-head"><div><p class="eyebrow">Coming soon</p><h2>Mark your calendar</h2></div><span class="section-note">Fresh releases in Bengaluru</span></div>
+  <div class="release-grid shelf">
+  {% for movie in upcoming %}
+    <article class="release-card"><img src="{{ movie.poster }}" alt="{{ movie.title }}"><div><span class="release-date">Releases {{ movie.release_date }}</span><h3>{{ movie.title }}</h3><p>{{ movie.genre }} · {{ movie.language }}</p><button class="btn outline small" type="button" data-coming-soon>Get reminder</button></div></article>
+  {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="theatres">
+  <div class="section-head"><div><p class="eyebrow">Cinema near you</p><h2>Choose your theatre</h2></div><span class="section-note">Showing around Bengaluru</span></div>
+  <div class="theatre-grid">
+  {% for theatre in theatres %}
+    <article class="theatre-card"><div class="theatre-icon">▣</div><div><h3>{{ theatre.name }}</h3><p>{{ theatre.area }} · {{ theatre.distance }}</p><span>{{ theatre.features }}</span></div><a href="{{ url_for('home', theatre=theatre.name) }}#theatre-selection" aria-label="View shows at {{ theatre.name }}">→</a></article>
+  {% endfor %}
+  </div>
+</section>
+
+{% if selected_theatre %}
+<section class="section theatre-selection" id="theatre-selection">
+  <div class="section-head"><div><p class="eyebrow">Selected theatre</p><h2>{{ selected_theatre.name }}</h2><p class="muted">{{ selected_theatre.area }} · {{ selected_theatre.distance }} · {{ selected_theatre.features }}</p></div><a class="btn outline small" href="{{ url_for('home') }}#theatres">Change theatre</a></div>
+  <div class="show-grid">
+  {% for show in theatre_shows %}
+    <article class="show-card"><div><strong>{{ show.movie.title }}</strong><span>{{ show.movie.language }} · {{ show.screen }}</span></div><div><strong>{{ show.time }}</strong><span>{{ show.format }}</span></div><strong>₹{{ show.price }}/seat</strong><a class="btn primary small" href="{{ url_for('seat_selection', showtime_id=show.id) }}">Select seats</a></article>
+  {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

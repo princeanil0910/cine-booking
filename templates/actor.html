@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ actor.name }} — Cine Booking{% endblock %}
+{% block content %}
+<section class="actor-hero">
+  <img src="{{ actor.image }}" alt="{{ actor.name }}">
+  <div><p class="eyebrow">Actor profile</p><h1>{{ actor.name }}</h1><p class="actor-role">{{ actor.role }}</p><p>{{ actor.bio }}</p><a class="btn primary" href="{{ url_for('home') }}#movies">Browse movies</a></div>
+</section>
+<section class="section"><p class="eyebrow">On screen</p><h2>Known for</h2><div class="actor-films">{% for movie in filmography %}<article><img src="{{ movie.poster }}" alt="{{ movie.title }}"><h3>{{ movie.title }}</h3><p>{{ movie.language }} · {{ movie.genre }}</p><a class="btn primary small" href="{{ url_for('movie_detail', movie_id=movie.id) }}">View movie</a></article>{% else %}<div class="empty"><h3>Filmography coming soon</h3></div>{% endfor %}</div></section>
+{% endblock %}

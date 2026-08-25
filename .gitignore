@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+cine_booking.db
+venv/
+.env
